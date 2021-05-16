@@ -17,6 +17,15 @@ public class GT4500 implements SpaceShip {
 
   }
 
+  public GT4500(TorpedoStore first, TorpedoStore second) {
+    this.primaryTorpedoStore = first;
+    this.secondaryTorpedoStore = second;
+  }
+
+  public boolean isPrimaryFiredLast() {
+    return wasPrimaryFiredLast;
+  }
+
   public boolean fireLaser(FiringMode firingMode) {
     // TODO not implemented yet
     return false;
@@ -42,58 +51,58 @@ public class GT4500 implements SpaceShip {
     boolean firingSuccess = false;
 
     switch (firingMode) {
-    case SINGLE:
-      if (wasPrimaryFiredLast) {
-        // try to fire the secondary first
-        if (!secondaryTorpedoStore.isEmpty()) {
-          firingSuccess = secondaryTorpedoStore.fire(1);
-          wasPrimaryFiredLast = false;
-        } else {
-          // although primary was fired last time, but the secondary is empty
-          // thus try to fire primary again
-          if (!primaryTorpedoStore.isEmpty()) {
-            firingSuccess = primaryTorpedoStore.fire(1);
-            wasPrimaryFiredLast = true;
-          }
-
-          // if both of the stores are empty, nothing can be done, return failure
-        }
-      } else {
-        // try to fire the primary first
-        if (!primaryTorpedoStore.isEmpty()) {
-          firingSuccess = primaryTorpedoStore.fire(1);
-          wasPrimaryFiredLast = true;
-        } else {
-          // although secondary was fired last time, but primary is empty
-          // thus try to fire secondary again
+      case SINGLE:
+        if (wasPrimaryFiredLast) {
+          // try to fire the secondary first
           if (!secondaryTorpedoStore.isEmpty()) {
             firingSuccess = secondaryTorpedoStore.fire(1);
             wasPrimaryFiredLast = false;
+          } else {
+            // although primary was fired last time, but the secondary is empty
+            // thus try to fire primary again
+            if (!primaryTorpedoStore.isEmpty()) {
+              firingSuccess = primaryTorpedoStore.fire(1);
+              wasPrimaryFiredLast = true;
+            }
+
+            // if both of the stores are empty, nothing can be done, return failure
           }
-
-          // if both of the stores are empty, nothing can be done, return failure
-        }
-      }
-      break;
-
-    case ALL:
-      if (!primaryTorpedoStore.isEmpty()) {
-        if (!secondaryTorpedoStore.isEmpty()) {
-          firingSuccess = primaryTorpedoStore.fire(1) && secondaryTorpedoStore.fire(1);
-          wasPrimaryFiredLast = true;
         } else {
-          firingSuccess = primaryTorpedoStore.fire(1);
-          wasPrimaryFiredLast = true;
+          // try to fire the primary first
+          if (!primaryTorpedoStore.isEmpty()) {
+            firingSuccess = primaryTorpedoStore.fire(1);
+            wasPrimaryFiredLast = true;
+          } else {
+            // although secondary was fired last time, but primary is empty
+            // thus try to fire secondary again
+            if (!secondaryTorpedoStore.isEmpty()) {
+              firingSuccess = secondaryTorpedoStore.fire(1);
+              wasPrimaryFiredLast = false;
+            }
+
+            // if both of the stores are empty, nothing can be done, return failure
+          }
         }
-      } else {
-        if (!secondaryTorpedoStore.isEmpty()) {
-          firingSuccess = secondaryTorpedoStore.fire(1);
-          wasPrimaryFiredLast = false;
+        break;
+
+      case ALL:
+        if (!primaryTorpedoStore.isEmpty()) {
+          if (!secondaryTorpedoStore.isEmpty()) {
+            firingSuccess = primaryTorpedoStore.fire(1) && secondaryTorpedoStore.fire(1);
+            wasPrimaryFiredLast = true;
+          } else {
+            firingSuccess = primaryTorpedoStore.fire(1);
+            wasPrimaryFiredLast = true;
+          }
         } else {
-          firingSuccess = false;
+          if (!secondaryTorpedoStore.isEmpty()) {
+            firingSuccess = secondaryTorpedoStore.fire(1);
+            wasPrimaryFiredLast = false;
+          } else {
+            firingSuccess = false;
+          }
         }
-      }
-      break;
+        break;
     }
 
     return firingSuccess;
